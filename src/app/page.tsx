@@ -9,7 +9,7 @@ import SocialsLinks from "../components/landingpage/socials-links";
 export default function Home() {
   return (
     <div className="bg-[#00000]">
-      <Header />
+    <Header />
     <KaiKnotLanding /> 
     <Concept /> 
     <ComingSoon />
