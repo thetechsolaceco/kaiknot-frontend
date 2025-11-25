@@ -113,7 +113,6 @@ const Concept = () => {
         ></div>
 
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 items-start relative z-10">
-
           {/* Sticky Title Area */}
           <div className="w-full md:w-1/3 md:sticky md:top-32" ref={titleRef}>
              {/* We wrap text in blocks to mask the slide-up animation */}

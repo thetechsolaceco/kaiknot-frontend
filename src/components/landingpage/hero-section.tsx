@@ -46,16 +46,7 @@ const KaiKnotLanding = () => {
       ref={containerRef}
       className="relative min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black overflow-x-hidden"
     >
-      {/* --- Starry Background --- */}
-      <div
-        className="
-          pointer-events-none
-          absolute inset-0 -z-10
-          bg-[radial-gradient(circle_at_1px_1px,#ffffff26_1px,transparent_0)]
-          bg-[length:40px_40px]
-          opacity-40
-        "
-      />
+
 
       {/* --- Navigation --- */}
       <header
