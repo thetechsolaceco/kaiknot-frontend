@@ -1,185 +1,179 @@
-"use client";
-
-import React, { useRef, useState } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ArrowRight, Instagram, X, Loader2 } from 'lucide-react'; // Make sure to install lucide-react
+"use client"
+import { useState } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import IntroAnimation from './intro-animation'
 
 const ComingSoon = () => {
-  const containerRef = useRef(null);
-  const formRef = useRef(null);
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('idle'); // idle, loading, success
+  const [showIntro, setShowIntro] = useState(true)
+  const { scrollYProgress } = useScroll()
 
-  useGSAP(() => {
-    const tl = gsap.timeline();
+  // Text scales up as you scroll (stays visible)
+  const textScale = useTransform(scrollYProgress, [0, 0.3], [1, 1.5])
+  
+  // Particles fade out as you scroll
+  const particleOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0])
 
-    // 1. Background Grid Fade In
-    tl.to(".bg-grid", { opacity: 0.4, duration: 1.5 });
+  const handleIntroComplete = () => {
+    setShowIntro(false)
+    window.scrollTo(0, 0)
+  }
 
-    // 2. Main Typography Reveal (Staggered)
-    tl.from(".hero-char", {
-      y: 150,
-      opacity: 0,
-      rotateX: -90,
-      stagger: 0.05,
-      duration: 1,
-      ease: "power4.out",
-    }, "-=1");
+  // Particle configurations (fixed values to avoid hydration issues)
+  const leftParticles = [
+    { size: 50, left: 20, top: 15, blur: 2, duration: 4 },
+    { size: 35, left: 60, top: 30, blur: 1.5, duration: 3.5 },
+    { size: 45, left: 40, top: 50, blur: 2.5, duration: 4.5 },
+    { size: 30, left: 70, top: 70, blur: 1.8, duration: 3.8 },
+    { size: 55, left: 25, top: 85, blur: 2.2, duration: 4.2 },
+    { size: 40, left: 55, top: 10, blur: 1.6, duration: 3.6 },
+    { size: 48, left: 15, top: 45, blur: 2.1, duration: 4.1 },
+    { size: 38, left: 75, top: 60, blur: 1.9, duration: 3.9 },
+  ]
 
-    // 3. Subtext and Form Reveal
-    tl.from(".fade-up", {
-      y: 20,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: "power2.out"
-    }, "-=0.5");
-
-    // 4. Marquee Animation (Infinite Loop)
-    gsap.to(".marquee-track", {
-      xPercent: -50,
-      repeat: -1,
-      duration: 20,
-      ease: "linear",
-    });
-
-  }, { scope: containerRef });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!email) return;
-    
-    setStatus('loading');
-    
-    // Simulate API call
-    setTimeout(() => {
-      setStatus('success');
-      // Animate Success State
-      gsap.to(formRef.current, {
-        scale: 1.05,
-        duration: 0.1,
-        yoyo: true,
-        repeat: 1
-      });
-    }, 1500);
-  };
+  const rightParticles = [
+    { size: 45, right: 25, top: 20, blur: 2.1, duration: 4.2 },
+    { size: 55, right: 55, top: 35, blur: 2.3, duration: 3.7 },
+    { size: 35, right: 40, top: 55, blur: 1.7, duration: 4.3 },
+    { size: 60, right: 70, top: 75, blur: 2.5, duration: 3.5 },
+    { size: 42, right: 20, top: 90, blur: 1.8, duration: 4.0 },
+    { size: 50, right: 60, top: 5, blur: 2.0, duration: 3.8 },
+    { size: 38, right: 35, top: 40, blur: 1.6, duration: 4.4 },
+    { size: 52, right: 75, top: 65, blur: 2.2, duration: 3.6 },
+  ]
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen bg-zinc-950 text-zinc-100 overflow-hidden flex flex-col justify-between selection:bg-white selection:text-black">
-      
-      {/* BACKGROUND LAYERS */}
-      {/* 1. Grid */}
-      <div 
-        className="bg-grid absolute inset-0 opacity-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: 'linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-          maskImage: 'radial-gradient(circle at center, black 40%, transparent 100%)'
-        }}
-      ></div>
-      
-      {/* 2. Noise Texture (CSS Trick) */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-10 mix-blend-overlay" 
-           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}>
-      </div>
+    <div className="relative w-full min-h-screen bg-black">
+      {/* Intro Animation */}
+      {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
 
-      {/* HEADER / NAV */}
-      <header className="relative z-20 w-full px-6 py-8 flex justify-between items-center fade-up">
-        <div className="font-bold text-xl tracking-widest">KAIKNOT</div>
-        <div className="flex gap-6 text-sm font-mono text-zinc-500">
-          <span>[ EST. 2025 ]</span>
-          <span className="hidden md:inline text-zinc-300">JAIPUR, IN</span>
-        </div>
-      </header>
+      {/* Content after intro */}
+      {!showIntro && (
+        <div className="relative bg-black">
+          <div className="h-[300vh]">
+            <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+              {/* Left Particles */}
+              <motion.div 
+                className="absolute left-0 top-0 h-full w-1/4 pointer-events-none"
+                style={{ opacity: particleOpacity }}
+              >
+                {leftParticles.map((particle, i) => (
+                  <motion.div
+                    key={`left-${i}`}
+                    className="absolute rounded-full bg-white"
+                    style={{
+                      width: particle.size,
+                      height: particle.size,
+                      left: `${particle.left}%`,
+                      top: `${particle.top}%`,
+                      filter: `blur(${particle.blur}px)`,
+                      boxShadow: '0 0 30px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.3)',
+                    }}
+                    initial={{ opacity: 0, scale: 0, x: -100 }}
+                    animate={{
+                      opacity: [0, 0.8, 0.6, 0.8],
+                      scale: [0, 1, 1.1, 1],
+                      x: 0,
+                      y: [0, -20, 0, -15, 0],
+                    }}
+                    transition={{
+                      duration: particle.duration,
+                      delay: i * 0.15,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
+              </motion.div>
 
-      {/* MAIN CONTENT */}
-      <main className="relative z-20 flex flex-col items-center justify-center w-full px-4 text-center">
-        
-        {/* Status Badge */}
-        <div className="fade-up inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm text-xs font-mono text-zinc-400 mb-8">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-          </span>
-          SYSTEM ONLINE : PREPARING LAUNCH
-        </div>
+              {/* Right Particles */}
+              <motion.div 
+                className="absolute right-0 top-0 h-full w-1/4 pointer-events-none"
+                style={{ opacity: particleOpacity }}
+              >
+                {rightParticles.map((particle, i) => (
+                  <motion.div
+                    key={`right-${i}`}
+                    className="absolute rounded-full bg-white"
+                    style={{
+                      width: particle.size,
+                      height: particle.size,
+                      right: `${particle.right}%`,
+                      top: `${particle.top}%`,
+                      filter: `blur(${particle.blur}px)`,
+                      boxShadow: '0 0 30px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.3)',
+                    }}
+                    initial={{ opacity: 0, scale: 0, x: 100 }}
+                    animate={{
+                      opacity: [0, 0.8, 0.6, 0.8],
+                      scale: [0, 1, 1.1, 1],
+                      x: 0,
+                      y: [0, -25, 0, -20, 0],
+                    }}
+                    transition={{
+                      duration: particle.duration,
+                      delay: i * 0.15,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
+              </motion.div>
 
-        {/* Giant Typography */}
-        <h1 className="text-[12vw] md:text-[10vw] font-black leading-[0.8] tracking-tighter mb-8 overflow-hidden">
-          <div className="flex justify-center gap-[1vw]">
-            {"WE ARE".split('').map((char, i) => (
-              <span key={i} className="hero-char inline-block">{char === ' ' ? '\u00A0' : char}</span>
-            ))}
+              {/* Coming Soon Text */}
+              <motion.div
+                className="text-center px-4 z-10"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+                style={{ 
+                  scale: textScale,
+                }}
+              >
+                <motion.h1
+                  className="text-7xl md:text-9xl font-bold text-white mb-6 font-[family-name:var(--font-network)] tracking-wide"
+                >
+                  Coming Soon
+                </motion.h1>
+                <motion.p
+                  className="text-xl md:text-2xl text-zinc-300"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 1 }}
+                >
+                  Something extraordinary is on the way
+                </motion.p>
+              </motion.div>
+            </div>
           </div>
-          <div className="flex justify-center gap-[1vw] text-zinc-600">
-             {"ARRIVING".split('').map((char, i) => (
-              <span key={i + 10} className="hero-char inline-block">{char}</span>
-            ))}
-          </div>
-        </h1>
 
-        {/* Email Capture */}
-        <div className="w-full max-w-md fade-up">
-          <p className="text-zinc-400 mb-6 text-lg font-light">
-            Rare apparel. Quiet confidence. <br className="hidden md:block"/>
-            Join the waitlist for Drop 01.
-          </p>
-
-          <form ref={formRef} onSubmit={handleSubmit} className="relative group">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={status === 'success'}
-              className="w-full bg-transparent border-b border-zinc-700 py-4 text-xl outline-none text-white placeholder:text-zinc-600 transition-colors focus:border-white"
-            />
-            <button 
-              type="submit"
-              disabled={status === 'success' || status === 'loading'}
-              className="absolute right-0 top-1/2 -translate-y-1/2 text-white hover:opacity-70 transition-opacity disabled:cursor-not-allowed"
+          {/* Next Section */}
+          <div className="min-h-screen bg-black flex items-center justify-center">
+            <motion.div
+              className="text-center px-4 max-w-4xl"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              viewport={{ once: true, amount: 0.3 }}
             >
-              {status === 'loading' ? (
-                <Loader2 className="animate-spin w-6 h-6" />
-              ) : status === 'success' ? (
-                <span className="text-sm font-mono text-green-400">JOINED</span>
-              ) : (
-                <ArrowRight className="w-6 h-6" />
-              )}
-            </button>
-          </form>
+              <h2 className="text-4xl md:text-6xl font-bold text-white mb-8">
+                Stay Tuned
+              </h2>
+              <p className="text-lg md:text-xl text-zinc-400 mb-12">
+                We&apos;re crafting something special just for you. Be the first to know when we launch.
+              </p>
+              <motion.button
+                className="px-8 py-4 bg-white text-black font-semibold rounded-full text-lg hover:bg-zinc-200 transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Notify Me
+              </motion.button>
+            </motion.div>
+          </div>
         </div>
-      </main>
-
-      {/* FOOTER / MARQUEE */}
-      <footer className="relative z-20 w-full overflow-hidden py-8 border-t border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
-        {/* Infinite Scrolling Text */}
-        <div className="marquee-track whitespace-nowrap flex items-center gap-8 text-zinc-700 font-black text-4xl md:text-6xl uppercase tracking-tighter select-none opacity-50 hover:opacity-100 transition-opacity duration-500">
-           <span>Don&apos;t Chase Trends</span>
-           <span className="text-zinc-800">•</span>
-           <span>Kaiknot</span>
-           <span className="text-zinc-800">•</span>
-           <span>Drop 01 Coming Soon</span>
-           <span className="text-zinc-800">•</span>
-           <span>Brutalist Aesthetic</span>
-           <span className="text-zinc-800">•</span>
-           <span>Don&apos;t Chase Trends</span>
-           <span className="text-zinc-800">•</span>
-           <span>Kaiknot</span>
-           <span className="text-zinc-800">•</span>
-           <span>Drop 01 Coming Soon</span>
-           <span className="text-zinc-800">•</span>
-           <span>Brutalist Aesthetic</span>
-           <span className="text-zinc-800">•</span>
-        </div>
-
-        {/* Social Links */}
-        <div className="fade-up absolute bottom-4 right-6 md:bottom-8 md:right-12 flex gap-4 text-zinc-400 bg-zinc-950 p-2">
-          <a href="#" className="hover:text-white transition-colors"><Instagram size={20} /></a>
-          <a href="#" className="hover:text-white transition-colors"><X size={20} /></a>
-        </div>
-      </footer>
+      )}
     </div>
   )
 }
